@@ -1,0 +1,73 @@
+// Prisma Schema for Student Attachment Attendance and Task Reporting System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  SUPERVISOR
+  ADMIN
+}
+
+model User {
+  id             String   @id @default(uuid())
+  name           String
+  email          String   @unique
+  password       String   @default("password123")
+  role           Role     @default(STUDENT)
+  registrationNo String?  @unique
+  course         String?
+  department     String?
+  organization   String?
+  title          String?
+  supervisorName String?
+  startDate      String?
+  endDate        String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  attendances     Attendance[]
+  taskReports     TaskReport[] @relation("StudentTaskReports")
+  reviewedReports TaskReport[] @relation("SupervisorTaskReviews")
+}
+
+model Attendance {
+  id                   String   @id @default(uuid())
+  studentId            String
+  student              User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  date                 String
+  status               String // Present, Absent, Half-Day, Late, On Leave
+  checkInTime          String?
+  checkOutTime         String?
+  workMode             String   @default("On-site") // On-site, Remote
+  location             String?
+  notes                String?
+  verifiedBySupervisor Boolean  @default(false)
+  createdAt            DateTime @default(now())
+}
+
+model TaskReport {
+  id             String    @id @default(uuid())
+  studentId      String
+  student        User      @relation("StudentTaskReports", fields: [studentId], references: [id], onDelete: Cascade)
+  supervisorId   String?
+  supervisor     User?     @relation("SupervisorTaskReviews", fields: [supervisorId], references: [id])
+  supervisorName String?
+  date           String
+  title          String
+  description    String
+  category       String
+  hoursSpent     Float
+  learnings      String
+  challenges     String?
+  status         String    @default("Pending") // Pending, Approved, Needs Revision, Rejected
+  feedback       String?
+  rating         Int?
+  reviewedAt     String?
+  createdAt      DateTime  @default(now())
+}

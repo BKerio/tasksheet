@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* AttachTrack — cool slate / teal academic system */
+
+@layer base {
+  :root {
+    --background: 210 28% 97%;
+    --foreground: 215 35% 14%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 35% 14%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 35% 14%;
+
+    --primary: 199 78% 32%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 24% 93%;
+    --secondary-foreground: 215 28% 24%;
+
+    --muted: 210 22% 94%;
+    --muted-foreground: 215 12% 42%;
+
+    --accent: 173 58% 36%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 199 78% 32%;
+
+    --radius: 0.625rem;
+
+    --gradient-hero: linear-gradient(145deg, hsl(215 40% 16%) 0%, hsl(199 55% 28%) 55%, hsl(173 45% 34%) 100%);
+    --gradient-surface: linear-gradient(180deg, hsl(210 28% 98%) 0%, hsl(210 24% 94%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 30% 98%) 100%);
+
+    --shadow-soft: 0 2px 12px -4px hsl(215 35% 14% / 0.08);
+    --shadow-card: 0 8px 24px -10px hsl(215 35% 14% / 0.1);
+    --shadow-elevated: 0 18px 40px -16px hsl(215 35% 14% / 0.16);
+
+    --sidebar-background: 215 38% 14%;
+    --sidebar-foreground: 210 20% 92%;
+    --sidebar-primary: 173 58% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 30% 20%;
+    --sidebar-accent-foreground: 210 20% 96%;
+    --sidebar-border: 215 28% 22%;
+    --sidebar-ring: 173 58% 42%;
+  }
+
+  .dark {
+    --background: 215 32% 8%;
+    --foreground: 210 20% 95%;
+
+    --card: 215 28% 11%;
+    --card-foreground: 210 20% 95%;
+
+    --popover: 215 28% 11%;
+    --popover-foreground: 210 20% 95%;
+
+    --primary: 199 72% 48%;
+    --primary-foreground: 215 32% 8%;
+
+    --secondary: 215 22% 18%;
+    --secondary-foreground: 210 15% 88%;
+
+    --muted: 215 20% 16%;
+    --muted-foreground: 210 10% 62%;
+
+    --accent: 173 50% 42%;
+    --accent-foreground: 215 32% 8%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 20% 20%;
+    --input: 215 20% 20%;
+    --ring: 199 72% 48%;
+
+    --sidebar-background: 215 35% 7%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 173 50% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 25% 14%;
+    --sidebar-accent-foreground: 210 20% 92%;
+    --sidebar-border: 215 22% 14%;
+    --sidebar-ring: 173 50% 42%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Source Sans 3', sans-serif;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(199 78% 32% / 0.06), transparent),
+      linear-gradient(180deg, hsl(210 28% 98%) 0%, hsl(210 24% 95%) 100%);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .bg-gradient-hero {
+    background: var(--gradient-hero);
+  }
+
+  .bg-gradient-surface {
+    background: var(--gradient-surface);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.45s ease-out forwards;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.35s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
