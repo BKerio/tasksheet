@@ -1,44 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import {
   Menu,
   UserCheck,
   ShieldCheck,
-  RotateCcw,
   LogOut,
   ChevronDown
 } from 'lucide-react';
-import { Student, Supervisor } from '@/types';
-import { resetToInitialData } from '@/lib/storage';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 
 interface HeaderProps {
-  students: Student[];
-  supervisors: Supervisor[];
-  activeStudent: Student | null;
-  activeSupervisor: Supervisor | null;
-  onSelectStudent: (student: Student) => void;
-  onSelectSupervisor: (supervisor: Supervisor) => void;
-  onDataReset?: () => void;
   onToggleSidebar?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  onDataReset,
   onToggleSidebar,
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const isAdminView = location.pathname.startsWith('/admin');
   const initials = user?.name
@@ -49,12 +48,6 @@ export const Header: React.FC<HeaderProps> = ({
     .join('')
     .toUpperCase() || 'U';
 
-  const handleReset = () => {
-    resetToInitialData();
-    localStorage.removeItem('taskapp_prisma_users');
-    toast.success('Data reset to initial state');
-    if (onDataReset) onDataReset();
-  };
 
   const handleLogout = () => {
     logout();
@@ -108,17 +101,35 @@ export const Header: React.FC<HeaderProps> = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 text-xs">
-              <DropdownMenuItem onClick={handleReset} className="cursor-pointer text-xs">
-                <RotateCcw className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
-                Reset Demo Data
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-xs text-rose-600 font-medium">
+              <DropdownMenuItem
+                onClick={() => setShowLogoutDialog(true)}
+                className="cursor-pointer text-xs text-rose-600 font-medium"
+              >
                 <LogOut className="h-3.5 w-3.5 mr-2" />
                 Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Sign out?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  You will be returned to the login screen. Any unsaved changes will be lost.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleLogout}
+                  className="bg-rose-600 hover:bg-rose-700 text-white"
+                >
+                  Sign Out
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </header>
