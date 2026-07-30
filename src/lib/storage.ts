@@ -243,7 +243,19 @@ export const getStoredSupervisors = (): Supervisor[] => {
     localStorage.setItem(STORAGE_KEYS.SUPERVISORS, JSON.stringify(INITIAL_SUPERVISORS));
     return INITIAL_SUPERVISORS;
   }
-  return JSON.parse(data);
+
+  // Older builds cached a list without the coordination-office admin, so add
+  // any seeded staff account that is missing instead of stranding the login.
+  const stored: Supervisor[] = JSON.parse(data);
+  const missing = INITIAL_SUPERVISORS.filter(
+    (seed) => !stored.some((s) => s.email.toLowerCase() === seed.email.toLowerCase())
+  );
+
+  if (missing.length === 0) return stored;
+
+  const merged = [...missing, ...stored];
+  localStorage.setItem(STORAGE_KEYS.SUPERVISORS, JSON.stringify(merged));
+  return merged;
 };
 
 export const getStoredAttendance = (): Attendance[] => {

@@ -24,8 +24,8 @@ import { toast } from 'sonner';
 interface HeaderProps {
   students: Student[];
   supervisors: Supervisor[];
-  activeStudent: Student;
-  activeSupervisor: Supervisor;
+  activeStudent: Student | null;
+  activeSupervisor: Supervisor | null;
   onSelectStudent: (student: Student) => void;
   onSelectSupervisor: (supervisor: Supervisor) => void;
   onDataReset?: () => void;
@@ -86,30 +86,13 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center bg-muted/70 p-0.5 rounded-lg border border-border/50 text-xs">
-            <button
-              onClick={() => navigate('/')}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 font-medium rounded-md transition-all ${
-                !isAdminView
-                  ? 'bg-card text-foreground shadow-soft'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <UserCheck className="h-3.5 w-3.5 text-primary" />
-              <span className="hidden sm:inline">Student</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/admin')}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 font-medium rounded-md transition-all ${
-                isAdminView
-                  ? 'bg-card text-foreground shadow-soft'
-                  : 'text-muted-foreground hover:text-foreground'
-              }`}
-            >
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-muted/70 border border-border/50 text-xs font-medium text-muted-foreground">
+            {isAdminView ? (
               <ShieldCheck className="h-3.5 w-3.5 text-accent" />
-              <span className="hidden sm:inline">Admin</span>
-            </button>
+            ) : (
+              <UserCheck className="h-3.5 w-3.5 text-primary" />
+            )}
+            <span className="capitalize">{user?.role.toLowerCase()}</span>
           </div>
 
           <DropdownMenu>

@@ -7,8 +7,8 @@ interface AppLayoutProps {
   children: React.ReactNode;
   students: Student[];
   supervisors: Supervisor[];
-  activeStudent: Student;
-  activeSupervisor: Supervisor;
+  activeStudent: Student | null;
+  activeSupervisor: Supervisor | null;
   onSelectStudent: (student: Student) => void;
   onSelectSupervisor: (supervisor: Supervisor) => void;
   onDataReset: () => void;

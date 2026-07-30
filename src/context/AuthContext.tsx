@@ -4,39 +4,54 @@ import { PrismaUser, getPrismaUsers } from '@/lib/prismaService';
 interface AuthContextType {
   user: PrismaUser | null;
   isAuthenticated: boolean;
-  login: (emailOrReg: string, password: string) => { success: boolean; message?: string };
+  login: (
+    emailOrReg: string,
+    password: string,
+    expectedPortal?: 'student' | 'admin'
+  ) => { success: boolean; message?: string };
   logout: () => void;
-  switchUser: (userId: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AUTH_STORAGE_KEY = 'taskapp_auth_session';
 
+// Session storage keeps a signed-in user across reloads within the same tab,
+// but never across a browser restart.
+const readStoredSession = (): PrismaUser | null => {
+  const stored = sessionStorage.getItem(AUTH_STORAGE_KEY);
+  if (!stored) return null;
+
+  try {
+    const parsed: PrismaUser = JSON.parse(stored);
+    const stillExists = getPrismaUsers().some((u) => u.id === parsed.id);
+    return stillExists ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<PrismaUser | null>(() => {
-    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch (e) {
-        return null;
-      }
-    }
-    // Default logged in as Ian Kipkorir Metto (Student 24-3769)
-    const users = getPrismaUsers();
-    return users.find((u) => u.registrationNo === '24-3769') || users[0] || null;
-  });
+  const [user, setUser] = useState<PrismaUser | null>(readStoredSession);
+
+  useEffect(() => {
+    // Clear any session persisted by earlier versions of the app.
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  }, []);
 
   useEffect(() => {
     if (user) {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+      sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
     } else {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
+      sessionStorage.removeItem(AUTH_STORAGE_KEY);
     }
   }, [user]);
 
-  const login = (emailOrReg: string, password: string) => {
+  const login = (
+    emailOrReg: string,
+    password: string,
+    expectedPortal?: 'student' | 'admin'
+  ) => {
     const users = getPrismaUsers();
     const cleanInput = emailOrReg.trim().toLowerCase();
 
@@ -50,8 +65,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, message: 'Invalid Student ID or Email address.' };
     }
 
-    if (foundUser.password && foundUser.password !== password) {
+    if (foundUser.password !== password) {
       return { success: false, message: 'Incorrect password.' };
+    }
+
+    const isStaff = foundUser.role === 'ADMIN' || foundUser.role === 'SUPERVISOR';
+    if (expectedPortal === 'student' && isStaff) {
+      return { success: false, message: 'Use the Admin tab to sign in with this account.' };
+    }
+    if (expectedPortal === 'admin' && !isStaff) {
+      return { success: false, message: 'Use the Student tab to sign in with this account.' };
     }
 
     setUser(foundUser);
@@ -60,15 +83,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-  };
-
-  const switchUser = (userId: string) => {
-    const users = getPrismaUsers();
-    const found = users.find((u) => u.id === userId);
-    if (found) {
-      setUser(found);
-    }
+    sessionStorage.removeItem(AUTH_STORAGE_KEY);
   };
 
   return (
@@ -78,7 +93,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: !!user,
         login,
         logout,
-        switchUser,
       }}
     >
       {children}
