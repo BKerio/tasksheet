@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import {
-  Menu,
   UserCheck,
   ShieldCheck,
   LogOut,
@@ -27,13 +26,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 
-interface HeaderProps {
-  onToggleSidebar?: () => void;
-}
-
-export const Header: React.FC<HeaderProps> = ({
-  onToggleSidebar,
-}) => {
+export const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -58,17 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-30 w-full h-14 border-b border-border/60 bg-card/80 backdrop-blur-md shadow-soft">
       <div className="px-4 h-full flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggleSidebar}
-            className="h-8 w-8 text-muted-foreground hover:text-foreground"
-          >
-            <Menu className="h-4 w-4" />
-          </Button>
-
-          <div>
+        <div>
             <span className="text-sm font-display font-semibold text-foreground block leading-tight">
               {isAdminView ? 'Supervisor Portal' : 'Student Portal'}
             </span>
@@ -76,7 +59,6 @@ export const Header: React.FC<HeaderProps> = ({
               Attachment tracking workspace
             </span>
           </div>
-        </div>
 
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-muted/70 border border-border/50 text-xs font-medium text-muted-foreground">

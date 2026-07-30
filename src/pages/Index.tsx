@@ -88,13 +88,6 @@ const Index: React.FC = () => {
 
   return (
     <AppLayout
-      students={students}
-      supervisors={supervisors}
-      activeStudent={activeStudent}
-      activeSupervisor={activeSupervisor}
-      onSelectStudent={setActiveStudent}
-      onSelectSupervisor={setActiveSupervisor}
-      onDataReset={loadData}
       activeTab={activeTab}
       onTabChange={setActiveTab}
     >
