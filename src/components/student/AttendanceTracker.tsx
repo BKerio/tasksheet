@@ -206,11 +206,11 @@ export const AttendanceTracker: React.FC<AttendanceTrackerProps> = ({
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
-                        {record.checkInTime || '—'} – {record.checkOutTime || '—'}
+                        {record.checkInTime || '-'} – {record.checkOutTime || '-'}
                       </td>
                       <td className="px-4 py-3 text-foreground">{record.workMode}</td>
-                      <td className="px-4 py-3 text-muted-foreground max-w-[180px] truncate">{record.location || '—'}</td>
-                      <td className="px-4 py-3 text-muted-foreground max-w-[200px] truncate">{record.notes || '—'}</td>
+                      <td className="px-4 py-3 text-muted-foreground max-w-[180px] truncate">{record.location || '-'}</td>
+                      <td className="px-4 py-3 text-muted-foreground max-w-[200px] truncate">{record.notes || '-'}</td>
                       <td className="px-4 py-3 text-right">
                         {record.verifiedBySupervisor ? (
                           <Badge variant="outline" className="text-[10px] border-emerald-300 text-emerald-700 bg-emerald-50">

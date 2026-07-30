@@ -220,7 +220,7 @@ export const TaskReportSubmitter: React.FC<TaskReportSubmitterProps> = ({
                   <div className="pt-3 border-t border-border">
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        Supervisor Remarks — {report.supervisorName || 'Industrial Supervisor'}
+                        Supervisor Remarks - {report.supervisorName || 'Industrial Supervisor'}
                       </p>
                       {report.rating && (
                         <span className="text-[11px] font-semibold text-foreground">Score: {report.rating}/100</span>

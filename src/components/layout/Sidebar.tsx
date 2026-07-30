@@ -143,7 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onTabChange, onColl
             </div>
           )}
 
-          {/* Toggle button — hidden when hovered-expanded so it doesn't push layout */}
+          {/* Toggle button - hidden when hovered-expanded so it doesn't push layout */}
           {(!collapsed || !hovered) && (
             <button
               onClick={() => setCollapsed((prev) => !prev)}

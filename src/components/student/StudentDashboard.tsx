@@ -69,7 +69,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           <p className="font-semibold text-foreground text-xs">Today's Attendance</p>
           <p className="text-[11px] text-muted-foreground mt-0.5">
             {todayAttendance
-              ? `Logged as ${todayAttendance.status} — ${todayAttendance.checkInTime || '—'} to ${todayAttendance.checkOutTime || '—'}`
+              ? `Logged as ${todayAttendance.status} - ${todayAttendance.checkInTime || '-'} to ${todayAttendance.checkOutTime || '-'}`
               : 'Not yet marked for today.'}
           </p>
         </div>
@@ -103,7 +103,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           },
           {
             label: 'Avg. Grade',
-            value: averageRating > 0 ? `${averageRating}%` : '—',
+            value: averageRating > 0 ? `${averageRating}%` : '-',
             sub: 'Supervisor score',
           },
         ].map(({ label, value, sub }) => (
