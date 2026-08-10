@@ -15,6 +15,7 @@ import { TaskReportReview } from '@/components/admin/TaskReportReview';
 import { AttendanceManagement } from '@/components/admin/AttendanceManagement';
 import { StudentRoster } from '@/components/admin/StudentRoster';
 import { StudentManagement } from '@/components/admin/StudentManagement';
+import { SupervisorManagement } from '@/components/admin/SupervisorManagement';
 import { SystemDocumentation } from '@/components/admin/SystemDocumentation';
 
 // Used when the signed-in staff member has no record in the local roster yet.
@@ -100,6 +101,14 @@ const Admin: React.FC = () => {
         <StudentManagement
           students={students}
           onStudentsUpdated={loadData}
+        />
+      )}
+
+      {activeTab === 'supervisor-management' && (
+        <SupervisorManagement
+          supervisors={supervisors}
+          currentUserEmail={user?.email}
+          onSupervisorsUpdated={loadData}
         />
       )}
 

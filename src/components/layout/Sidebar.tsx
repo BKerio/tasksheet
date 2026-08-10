@@ -9,6 +9,7 @@ import {
   User,
   Users,
   UserCheck,
+  UserCog,
   ShieldCheck,
   BookOpen,
   LogOut,
@@ -62,6 +63,7 @@ const adminSections: NavSection[] = [
     title: 'Management',
     items: [
       { id: 'student-management', label: 'Student Management', icon: UserCheck },
+      { id: 'supervisor-management', label: 'Supervisor Management', icon: UserCog },
       { id: 'task-reviews', label: 'Logbook Reviews', icon: FileCheck },
       { id: 'attendance-monitoring', label: 'Attendance Logs', icon: CalendarCheck },
       { id: 'student-roster', label: 'Student Roster', icon: Users },

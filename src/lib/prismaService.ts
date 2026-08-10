@@ -135,4 +135,33 @@ export const getPrismaSupervisors = (): Supervisor[] => {
     }));
 };
 
+export const savePrismaUsers = (users: PrismaUser[]) => {
+  localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+};
+
+export const findPrismaUserByEmail = (email: string): PrismaUser | undefined => {
+  return getPrismaUsers().find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
+};
+
+export const addPrismaUser = (user: PrismaUser) => {
+  const users = getPrismaUsers();
+  savePrismaUsers([user, ...users]);
+};
+
+// Matches the existing account by its original email (call before mutating the
+// email locally) and merges in only the fields provided — omit `password` to
+// leave the current one untouched.
+export const updatePrismaUserByEmail = (originalEmail: string, updates: Partial<PrismaUser>) => {
+  const users = getPrismaUsers();
+  const updated = users.map((u) =>
+    u.email.toLowerCase() === originalEmail.trim().toLowerCase() ? { ...u, ...updates } : u
+  );
+  savePrismaUsers(updated);
+};
+
+export const deletePrismaUserByEmail = (email: string) => {
+  const users = getPrismaUsers();
+  savePrismaUsers(users.filter((u) => u.email.toLowerCase() !== email.trim().toLowerCase()));
+};
+
 export { KEYS };

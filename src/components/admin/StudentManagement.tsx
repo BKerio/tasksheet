@@ -8,8 +8,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Users, Plus, Search, Edit3, Trash2, GraduationCap, Building2, User, Mail, Calendar, CheckCircle2 } from 'lucide-react';
+import { Users, Plus, Search, Edit3, Trash2, GraduationCap, Building2, User, Mail, Calendar, CheckCircle2, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  findPrismaUserByEmail,
+  addPrismaUser,
+  updatePrismaUserByEmail,
+  deletePrismaUserByEmail,
+} from '@/lib/prismaService';
 
 interface StudentManagementProps {
   students: Student[];
@@ -35,6 +41,10 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
   const [supervisorName, setSupervisorName] = useState('Dr. Sarah Wambui');
   const [startDate, setStartDate] = useState('2026-06-01');
   const [endDate, setEndDate] = useState('2026-08-31');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [editConfirmPassword, setEditConfirmPassword] = useState('');
 
   const supervisors = getStoredSupervisors();
 
@@ -46,6 +56,8 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
     setCourse('DICT 240 – Software Project Proposal');
     setDepartment('Department of Information Technology');
     setSupervisorName('Dr. Sarah Wambui');
+    setPassword('');
+    setConfirmPassword('');
   };
 
   const handleOpenAddModal = () => {
@@ -64,6 +76,8 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
     setSupervisorName(st.supervisorName);
     setStartDate(st.startDate);
     setEndDate(st.endDate);
+    setEditPassword('');
+    setEditConfirmPassword('');
   };
 
   // CREATE (Add Student)
@@ -71,6 +85,21 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
     e.preventDefault();
     if (!registrationNo || !name || !email) {
       toast.error('Please fill in all required student details.');
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      toast.error('Password must be at least 6 characters.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match.');
+      return;
+    }
+
+    if (findPrismaUserByEmail(email)) {
+      toast.error('An account with this email already exists.');
       return;
     }
 
@@ -91,6 +120,22 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
     const updated = [newStudent, ...currentStudents];
     localStorage.setItem('taskapp_students', JSON.stringify(updated));
 
+    // Create the matching login account so the candidate can sign in right away.
+    addPrismaUser({
+      id: `user-${newStudent.id}`,
+      name,
+      email,
+      password,
+      role: 'STUDENT',
+      registrationNo,
+      course,
+      department,
+      organization: newStudent.organization,
+      supervisorName,
+      startDate,
+      endDate,
+    });
+
     toast.success(`Student candidate ${name} (${registrationNo}) added!`);
     setIsAddOpen(false);
     resetForm();
@@ -101,6 +146,17 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingStudent) return;
+
+    if (editPassword || editConfirmPassword) {
+      if (editPassword.length < 6) {
+        toast.error('New password must be at least 6 characters.');
+        return;
+      }
+      if (editPassword !== editConfirmPassword) {
+        toast.error('New passwords do not match.');
+        return;
+      }
+    }
 
     const currentStudents = getStoredStudents();
     const updated = currentStudents.map((st) => {
@@ -123,6 +179,20 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
 
     localStorage.setItem('taskapp_students', JSON.stringify(updated));
 
+    // Keep the login account (matched by the pre-edit email) in sync.
+    updatePrismaUserByEmail(editingStudent.email, {
+      name,
+      email,
+      registrationNo,
+      course,
+      department,
+      organization,
+      supervisorName,
+      startDate,
+      endDate,
+      ...(editPassword ? { password: editPassword } : {}),
+    });
+
     toast.success(`Student record for ${name} updated.`);
     setEditingStudent(null);
     onStudentsUpdated();
@@ -135,6 +205,7 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
     const currentStudents = getStoredStudents();
     const updated = currentStudents.filter((st) => st.id !== deletingStudent.id);
     localStorage.setItem('taskapp_students', JSON.stringify(updated));
+    deletePrismaUserByEmail(deletingStudent.email);
 
     toast.success(`Student ${deletingStudent.name} removed.`);
     setDeletingStudent(null);
@@ -319,6 +390,34 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
+                <Label htmlFor="addPassword" className="text-xs">Login Password</Label>
+                <Input
+                  id="addPassword"
+                  type="password"
+                  placeholder="Min. 6 characters"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-8 text-xs"
+                  required
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="addConfirmPassword" className="text-xs">Confirm Password</Label>
+                <Input
+                  id="addConfirmPassword"
+                  type="password"
+                  placeholder="Re-enter password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="h-8 text-xs"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
                 <Label htmlFor="addCourse" className="text-xs">Course</Label>
                 <Input
                   id="addCourse"
@@ -429,6 +528,34 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
                   className="h-8 text-xs"
                   required
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="editPassword" className="text-xs flex items-center gap-1">
+                    <KeyRound className="h-3 w-3" /> New Password
+                  </Label>
+                  <Input
+                    id="editPassword"
+                    type="password"
+                    placeholder="Leave blank to keep unchanged"
+                    value={editPassword}
+                    onChange={(e) => setEditPassword(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="editConfirmPassword" className="text-xs">Confirm New Password</Label>
+                  <Input
+                    id="editConfirmPassword"
+                    type="password"
+                    placeholder="Re-enter new password"
+                    value={editConfirmPassword}
+                    onChange={(e) => setEditConfirmPassword(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

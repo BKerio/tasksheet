@@ -335,6 +335,12 @@ export const reviewTaskReport = (
   return updatedReport;
 };
 
+export const deleteTaskReport = (reportId: string): void => {
+  const current = getStoredTaskReports();
+  const updated = current.filter((r) => r.id !== reportId);
+  saveTaskReports(updated);
+};
+
 export const resetToInitialData = () => {
   localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(INITIAL_STUDENTS));
   localStorage.setItem(STORAGE_KEYS.SUPERVISORS, JSON.stringify(INITIAL_SUPERVISORS));

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Student, Supervisor, TaskReport, ReportStatus } from '@/types';
-import { reviewTaskReport } from '@/lib/storage';
+import { reviewTaskReport, deleteTaskReport } from '@/lib/storage';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { FileCheck, CheckCircle2, Clock, AlertCircle, Award, MessageSquare, BookOpen, Search, Filter, ShieldCheck } from 'lucide-react';
+import {
+  FileCheck,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  Award,
+  MessageSquare,
+  BookOpen,
+  Search,
+  Filter,
+  ShieldCheck,
+  FileSpreadsheet,
+  FileText,
+  Trash2,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 interface TaskReportReviewProps {
@@ -26,6 +40,7 @@ export const TaskReportReview: React.FC<TaskReportReviewProps> = ({
   onReportReviewed,
 }) => {
   const [selectedReport, setSelectedReport] = useState<TaskReport | null>(null);
+  const [deletingReport, setDeletingReport] = useState<TaskReport | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedStudentId, setSelectedStudentId] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -59,6 +74,14 @@ export const TaskReportReview: React.FC<TaskReportReviewProps> = ({
     onReportReviewed();
   };
 
+  const handleDeleteConfirm = () => {
+    if (!deletingReport) return;
+    deleteTaskReport(deletingReport.id);
+    toast.success('Task report deleted.');
+    setDeletingReport(null);
+    onReportReviewed();
+  };
+
   const filteredReports = taskReports.filter((report) => {
     const matchesStudent = selectedStudentId === 'all' || report.studentId === selectedStudentId;
     const matchesStatus = statusFilter === 'all' || report.status === statusFilter;
@@ -82,6 +105,44 @@ export const TaskReportReview: React.FC<TaskReportReviewProps> = ({
           <p className="text-sm text-muted-foreground">
             Review student attachment logbooks, assign performance grades, and provide constructive feedback.
           </p>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={async () => {
+              if (filteredReports.length === 0) {
+                toast.error('No reports to export.');
+                return;
+              }
+              const { exportTaskReportsToExcel } = await import('@/lib/export');
+              exportTaskReportsToExcel(filteredReports, students);
+              toast.success('Exported to Excel.');
+            }}
+            className="text-xs gap-1.5"
+          >
+            <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-600" />
+            Export Excel
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={async () => {
+              if (filteredReports.length === 0) {
+                toast.error('No reports to export.');
+                return;
+              }
+              const { exportTaskReportsToPDF } = await import('@/lib/export');
+              exportTaskReportsToPDF(filteredReports, students);
+              toast.success('Exported to PDF.');
+            }}
+            className="text-xs gap-1.5"
+          >
+            <FileText className="h-3.5 w-3.5 text-rose-600" />
+            Export PDF
+          </Button>
         </div>
       </div>
 
@@ -189,6 +250,16 @@ export const TaskReportReview: React.FC<TaskReportReviewProps> = ({
                       }
                     >
                       {report.status === 'Pending' ? 'Evaluate & Grade' : 'Update Review'}
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setDeletingReport(report)}
+                      className="h-8 w-8 text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10"
+                      title="Delete Report"
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardHeader>
@@ -301,6 +372,37 @@ export const TaskReportReview: React.FC<TaskReportReviewProps> = ({
                 </Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deletingReport && (
+        <Dialog open={!!deletingReport} onOpenChange={(open) => !open && setDeletingReport(null)}>
+          <DialogContent className="sm:max-w-[400px]">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold text-rose-600 flex items-center gap-2">
+                <Trash2 className="h-4 w-4" />
+                Delete Task Report
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="py-2 text-xs text-muted-foreground space-y-2">
+              <p>
+                Are you sure you want to delete "<strong className="text-foreground">{deletingReport.title}</strong>"
+                submitted by {students.find((s) => s.id === deletingReport.studentId)?.name || 'this student'} on {deletingReport.date}?
+              </p>
+              <p className="text-[11px] text-rose-600/80">This will permanently remove the logbook entry, including any grading and feedback.</p>
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" size="sm" onClick={() => setDeletingReport(null)} className="h-8 text-xs">
+                Cancel
+              </Button>
+              <Button type="button" size="sm" onClick={handleDeleteConfirm} className="h-8 text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white">
+                Confirm Delete
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       )}
