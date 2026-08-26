@@ -37,7 +37,7 @@ async function main() {
     data: {
       id: "user-sup-1",
       name: "Dr. Sarah Wambui",
-      email: "sarah.wambui@university.ac.ke",
+      email: "sarah.wambui@university.ac.ke",lll
       password: "adminpassword",
       role: "SUPERVISOR",
       department: "Information Technology",
