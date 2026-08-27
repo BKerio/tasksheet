@@ -12,6 +12,7 @@ import {
   UserCog,
   ShieldCheck,
   BookOpen,
+  FileBarChart,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -68,6 +69,10 @@ const adminSections: NavSection[] = [
       { id: 'attendance-monitoring', label: 'Attendance Logs', icon: CalendarCheck },
       { id: 'student-roster', label: 'Student Roster', icon: Users },
     ],
+  },
+  {
+    title: 'Insights',
+    items: [{ id: 'system-report', label: 'System Report', icon: FileBarChart }],
   },
   {
     title: 'System',

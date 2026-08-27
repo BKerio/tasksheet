@@ -14,6 +14,7 @@ import { AdminDashboard } from '@/components/admin/AdminDashboard';
 import { TaskReportReview } from '@/components/admin/TaskReportReview';
 import { AttendanceManagement } from '@/components/admin/AttendanceManagement';
 import { StudentRoster } from '@/components/admin/StudentRoster';
+import { SystemReport } from '@/components/admin/SystemReport';
 import { StudentManagement } from '@/components/admin/StudentManagement';
 import { SupervisorManagement } from '@/components/admin/SupervisorManagement';
 import { SystemDocumentation } from '@/components/admin/SystemDocumentation';
@@ -132,6 +133,15 @@ const Admin: React.FC = () => {
       {activeTab === 'student-roster' && (
         <StudentRoster
           students={students}
+          attendanceList={attendance}
+          taskReports={taskReports}
+        />
+      )}
+
+      {activeTab === 'system-report' && (
+        <SystemReport
+          students={students}
+          supervisors={supervisors}
           attendanceList={attendance}
           taskReports={taskReports}
         />
