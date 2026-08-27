@@ -102,37 +102,49 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Clean Metrics Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-border/40 shadow-none hover:border-border/80 transition-colors">
-          <CardContent className="p-4">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Active Candidates</p>
-            <p className="text-2xl font-bold text-foreground mt-1">{totalStudents}</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Enrolled in DICT 240</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/40 shadow-none hover:border-border/80 transition-colors">
-          <CardContent className="p-4">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Today's Attendance</p>
-            <p className="text-2xl font-bold text-foreground mt-1">{attendanceRate}%</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">{presentToday} of {totalStudents} present today</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/40 shadow-none hover:border-border/80 transition-colors">
-          <CardContent className="p-4">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Pending Reviews</p>
-            <p className="text-2xl font-bold text-foreground mt-1">{pendingReports.length}</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Awaiting evaluation</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/40 shadow-none hover:border-border/80 transition-colors">
-          <CardContent className="p-4">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Average Grade</p>
-            <p className="text-2xl font-bold text-foreground mt-1">{avgScore}%</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Across all evaluations</p>
-          </CardContent>
-        </Card>
+        {[
+          {
+            label: 'Active Candidates',
+            value: totalStudents,
+            sub: 'Enrolled in DICT 240',
+            icon: Users,
+            color: 'text-blue-600 bg-blue-50',
+          },
+          {
+            label: "Today's Attendance",
+            value: `${attendanceRate}%`,
+            sub: `${presentToday} of ${totalStudents} present today`,
+            icon: CalendarCheck,
+            color: 'text-emerald-600 bg-emerald-50',
+          },
+          {
+            label: 'Pending Reviews',
+            value: pendingReports.length,
+            sub: 'Awaiting evaluation',
+            icon: FileCheck,
+            color: 'text-amber-600 bg-amber-50',
+          },
+          {
+            label: 'Average Grade',
+            value: `${avgScore}%`,
+            sub: 'Across all evaluations',
+            icon: Award,
+            color: 'text-violet-600 bg-violet-50',
+          },
+        ].map(({ label, value, sub, icon: Icon, color }) => (
+          <Card key={label} className="border-border/40 shadow-none hover:border-border/80 transition-colors">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+                <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${color}`}>
+                  <Icon className="h-3.5 w-3.5" />
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-foreground mt-1">{value}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{sub}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Clean Analytics Grid */}

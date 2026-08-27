@@ -3,7 +3,7 @@ import { Student, Attendance, TaskReport } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Plus } from 'lucide-react';
+import { ArrowRight, Plus, CalendarCheck, Clock, CheckCircle2, Award } from 'lucide-react';
 
 interface StudentDashboardProps {
   student: Student;
@@ -90,26 +90,39 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             label: 'Attendance Rate',
             value: `${attendanceRate}%`,
             sub: `${presentDays} of ${totalDays} days present`,
+            icon: CalendarCheck,
+            color: 'text-emerald-600 bg-emerald-50',
           },
           {
             label: 'Work Hours',
             value: `${totalHoursLogged}h`,
             sub: `${studentReports.length} task reports`,
+            icon: Clock,
+            color: 'text-blue-600 bg-blue-50',
           },
           {
             label: 'Approved',
             value: approvedReports,
             sub: `${pendingReports} pending review`,
+            icon: CheckCircle2,
+            color: 'text-teal-600 bg-teal-50',
           },
           {
             label: 'Avg. Grade',
             value: averageRating > 0 ? `${averageRating}%` : '-',
             sub: 'Supervisor score',
+            icon: Award,
+            color: 'text-violet-600 bg-violet-50',
           },
-        ].map(({ label, value, sub }) => (
+        ].map(({ label, value, sub, icon: Icon, color }) => (
           <Card key={label} className="border-border shadow-none">
             <CardContent className="p-4">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+                <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${color}`}>
+                  <Icon className="h-3.5 w-3.5" />
+                </div>
+              </div>
               <p className="text-2xl font-bold text-foreground mt-1">{value}</p>
               <p className="text-[11px] text-muted-foreground mt-0.5">{sub}</p>
             </CardContent>
