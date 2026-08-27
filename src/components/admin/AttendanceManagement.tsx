@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { CalendarCheck, CheckCircle2, Search, Filter, ShieldCheck, Download, Clock } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { CalendarCheck, CheckCircle2, Search, Filter, ShieldCheck, Download, Clock, Percent } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface AttendanceManagementProps {
@@ -35,6 +36,19 @@ export const AttendanceManagement: React.FC<AttendanceManagementProps> = ({
     toast.success('Attendance verification status updated.');
     onAttendanceUpdated();
   };
+
+  // Per-student attendance rate: (Present + Late) / total logged days, rounded.
+  const attendanceRateByStudent = students.map((st) => {
+    const records = attendanceList.filter((a) => a.studentId === st.id);
+    const totalLogged = records.length;
+    const presentCount = records.filter((a) => a.status === 'Present' || a.status === 'Late').length;
+    const absentCount = records.filter((a) => a.status === 'Absent').length;
+    const rate = totalLogged > 0 ? Math.round((presentCount / totalLogged) * 100) : 0;
+    return { student: st, totalLogged, presentCount, absentCount, rate };
+  });
+
+  const rateColorClass = (rate: number) =>
+    rate >= 80 ? 'text-emerald-600' : rate >= 50 ? 'text-amber-600' : 'text-rose-600';
 
   const filteredAttendance = attendanceList.filter((record) => {
     const matchesStudent = selectedStudentId === 'all' || record.studentId === selectedStudentId;
@@ -109,9 +123,9 @@ export const AttendanceManagement: React.FC<AttendanceManagementProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Students</SelectItem>
-                {students.map((st) => (
+                {attendanceRateByStudent.map(({ student: st, rate }) => (
                   <SelectItem key={st.id} value={st.id}>
-                    {st.name} ({st.registrationNo})
+                    {st.name} ({st.registrationNo}) — {rate}%
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -134,6 +148,55 @@ export const AttendanceManagement: React.FC<AttendanceManagementProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Attendance Rate by Student */}
+      {attendanceRateByStudent.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base font-bold flex items-center gap-2">
+              <Percent className="h-4 w-4 text-amber-500" />
+              Attendance Rate by Student
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Share of logged days marked Present or Late, per student.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-muted/50 border-b border-border text-muted-foreground font-semibold uppercase tracking-wider">
+                  <tr>
+                    <th className="p-4">Student</th>
+                    <th className="p-4">Days Logged</th>
+                    <th className="p-4">Present / Late</th>
+                    <th className="p-4">Absent</th>
+                    <th className="p-4 w-[220px]">Rate</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/60">
+                  {attendanceRateByStudent.map(({ student: st, totalLogged, presentCount, absentCount, rate }) => (
+                    <tr key={st.id} className="hover:bg-muted/20 transition-colors">
+                      <td className="p-4">
+                        <p className="font-bold text-foreground">{st.name}</p>
+                        <p className="text-[11px] text-muted-foreground">Adm: {st.registrationNo}</p>
+                      </td>
+                      <td className="p-4 text-muted-foreground">{totalLogged}</td>
+                      <td className="p-4 text-muted-foreground">{presentCount}</td>
+                      <td className="p-4 text-muted-foreground">{absentCount}</td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <Progress value={rate} className="h-1.5 flex-1" />
+                          <span className={`font-bold ${rateColorClass(rate)}`}>{rate}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Attendance Roster Table */}
       <Card>

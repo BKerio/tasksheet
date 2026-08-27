@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -44,6 +45,13 @@ export const AttendanceTracker: React.FC<AttendanceTrackerProps> = ({
   const [notes, setNotes] = useState('');
 
   const studentAttendance = attendanceList.filter((a) => a.studentId === student.id);
+
+  const totalLogged = studentAttendance.length;
+  const presentCount = studentAttendance.filter((a) => a.status === 'Present' || a.status === 'Late').length;
+  const absentCount = studentAttendance.filter((a) => a.status === 'Absent').length;
+  const attendanceRate = totalLogged > 0 ? Math.round((presentCount / totalLogged) * 100) : 0;
+  const rateColorClass =
+    attendanceRate >= 80 ? 'text-emerald-600' : attendanceRate >= 50 ? 'text-amber-600' : 'text-rose-600';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,6 +155,23 @@ export const AttendanceTracker: React.FC<AttendanceTrackerProps> = ({
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Attendance Rate Summary */}
+      <Card className="border-border shadow-none">
+        <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div className="shrink-0">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Attendance Rate</p>
+            <p className={`text-2xl font-bold mt-0.5 ${rateColorClass}`}>{attendanceRate}%</p>
+          </div>
+          <div className="flex-1 w-full space-y-1.5">
+            <Progress value={attendanceRate} className="h-2" />
+            <p className="text-[11px] text-muted-foreground">
+              {presentCount} present/late out of {totalLogged} day{totalLogged === 1 ? '' : 's'} logged
+              {absentCount > 0 && ` · ${absentCount} absent`}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">

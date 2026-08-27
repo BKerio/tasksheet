@@ -15,6 +15,7 @@ import {
   updatePrismaUserByEmail,
   deletePrismaUserByEmail,
 } from '@/lib/prismaService';
+import { DEPARTMENTS, resolveDepartmentOption } from '@/lib/departments';
 
 interface SupervisorManagementProps {
   supervisors: Supervisor[];
@@ -372,13 +373,31 @@ export const SupervisorManagement: React.FC<SupervisorManagementProps> = ({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label htmlFor="addSupDept" className="text-xs">Department</Label>
-                <Input
-                  id="addSupDept"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  className="h-8 text-xs"
-                  required
-                />
+                <Select
+                  value={resolveDepartmentOption(department)}
+                  onValueChange={(val) => setDepartment(val === 'Other' ? '' : val)}
+                >
+                  <SelectTrigger id="addSupDept" className="h-8 text-xs">
+                    <SelectValue placeholder="Select Department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DEPARTMENTS.map((d) => (
+                      <SelectItem key={d} value={d} className="text-xs">
+                        {d}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="Other" className="text-xs">Other (specify)</SelectItem>
+                  </SelectContent>
+                </Select>
+                {resolveDepartmentOption(department) === 'Other' && (
+                  <Input
+                    placeholder="Enter department name"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    className="h-8 text-xs mt-1.5"
+                    required
+                  />
+                )}
               </div>
 
               <div className="space-y-1">
@@ -487,13 +506,31 @@ export const SupervisorManagement: React.FC<SupervisorManagementProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label htmlFor="editSupDept" className="text-xs">Department</Label>
-                  <Input
-                    id="editSupDept"
-                    value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
-                    className="h-8 text-xs"
-                    required
-                  />
+                  <Select
+                    value={resolveDepartmentOption(department)}
+                    onValueChange={(val) => setDepartment(val === 'Other' ? '' : val)}
+                  >
+                    <SelectTrigger id="editSupDept" className="h-8 text-xs">
+                      <SelectValue placeholder="Select Department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DEPARTMENTS.map((d) => (
+                        <SelectItem key={d} value={d} className="text-xs">
+                          {d}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="Other" className="text-xs">Other (specify)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {resolveDepartmentOption(department) === 'Other' && (
+                    <Input
+                      placeholder="Enter department name"
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
+                      className="h-8 text-xs mt-1.5"
+                      required
+                    />
+                  )}
                 </div>
 
                 <div className="space-y-1">

@@ -16,6 +16,7 @@ import {
   updatePrismaUserByEmail,
   deletePrismaUserByEmail,
 } from '@/lib/prismaService';
+import { DEPARTMENTS, resolveDepartmentOption } from '@/lib/departments';
 
 interface StudentManagementProps {
   students: Student[];
@@ -430,13 +431,31 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
 
               <div className="space-y-1">
                 <Label htmlFor="addDept" className="text-xs">Department</Label>
-                <Input
-                  id="addDept"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  className="h-8 text-xs"
-                  required
-                />
+                <Select
+                  value={resolveDepartmentOption(department)}
+                  onValueChange={(val) => setDepartment(val === 'Other' ? '' : val)}
+                >
+                  <SelectTrigger id="addDept" className="h-8 text-xs">
+                    <SelectValue placeholder="Select Department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DEPARTMENTS.map((d) => (
+                      <SelectItem key={d} value={d} className="text-xs">
+                        {d}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="Other" className="text-xs">Other (specify)</SelectItem>
+                  </SelectContent>
+                </Select>
+                {resolveDepartmentOption(department) === 'Other' && (
+                  <Input
+                    placeholder="Enter department name"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    className="h-8 text-xs mt-1.5"
+                    required
+                  />
+                )}
               </div>
             </div>
 
@@ -528,6 +547,48 @@ export const StudentManagement: React.FC<StudentManagementProps> = ({
                   className="h-8 text-xs"
                   required
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="editCourse" className="text-xs">Course</Label>
+                  <Input
+                    id="editCourse"
+                    value={course}
+                    onChange={(e) => setCourse(e.target.value)}
+                    className="h-8 text-xs"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <Label htmlFor="editDept" className="text-xs">Department</Label>
+                  <Select
+                    value={resolveDepartmentOption(department)}
+                    onValueChange={(val) => setDepartment(val === 'Other' ? '' : val)}
+                  >
+                    <SelectTrigger id="editDept" className="h-8 text-xs">
+                      <SelectValue placeholder="Select Department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DEPARTMENTS.map((d) => (
+                        <SelectItem key={d} value={d} className="text-xs">
+                          {d}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="Other" className="text-xs">Other (specify)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {resolveDepartmentOption(department) === 'Other' && (
+                    <Input
+                      placeholder="Enter department name"
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
+                      className="h-8 text-xs mt-1.5"
+                      required
+                    />
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
